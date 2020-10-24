@@ -23,22 +23,34 @@
 cmake_minimum_required(VERSION 3.16.3)
 
 # >>> Setze Projekt Name
-project(serenitycore)
+project(serenity)
 
 # >>> Füge CMake Macros in die liste ein
 list(APPEND CMAKE_MODULE_PATH
         "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Macros")
+
+# >>> Für einen schnelleren compiling prozess wenn die CMake-Version < 3.16.0 ist
+if(CMAKE_VERSION VERSION_LESS "3.16.0")
+    list(APPEND CMAKE_MODULE_PATH
+            "${CMAKE_SOURCE_DIR}/Dependencies/Cotire")
+endif()
+
+include(CheckCXXSourceRuns)
+include(CheckIncludeFiles)
+include(ConfigureBaseTarget)
+include(CheckPlatform)
 
 # >>> Finde Packete - Libraries die wir brauchen
 find_package(MySQL)
 find_package(Git)
 find_package(PCHSupport)
 find_package(OpenSSL)
-
-include(GroupSources)
-include(CollectIncludeDirectories)
-include(CollectSourceFiles)
-
 find_package(Boost)
+
+# >>> Include CMake Scripts
+include(GroupSources)
+include(AutoCollect)
+
+
 
 add_subdirectory(Source)

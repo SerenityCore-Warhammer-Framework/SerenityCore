@@ -18,26 +18,3 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-
-# >>> Instuction:
-# CollectIncludeDirectories(
-#    ${CMAKE_CURRENT_SOURCE_DIR}
-#    COMMON_PRIVATE_SOURCES
-#    # Exclude
-#    ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
-#    ${CMAKE_CURRENT_SOURCE_DIR}/Platform)
-#
-function(CollectIncludeDirectories currentDir variable)
-    list(FIND ARGN "${currentDir}" IS_EXCLUDED)
-    if(IS_EXCLUDED EQUAL -1)
-        list(APPEND ${variable} ${currentDir})
-        list(GLOB SUB_DIRECTORIES ${currentDir}/*)
-        foreach(SUB_DIRECTORY ${SUB_DIRECTORIES})
-            if(IS_DIRECTORY ${SUB_DIRECTORY})
-                CollectIncludeDirectories("${SUB_DIRECTORY}" "${variable}" "${ARGN}")
-            endif()
-        endforeach()
-        set(${variable} ${${variable}} PARENT_SCOPE)
-    endif()
-endfunction()
