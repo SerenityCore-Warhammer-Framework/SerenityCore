@@ -18,62 +18,55 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
+include_directories(${MYSQL_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIR})
+
+# >>> Alle Source Files zusammen suchen...
 CollectSourceFiles(
         ${CMAKE_CURRENT_SOURCE_DIR}
         PRIVATE_SOURCES
         # Exclude
-        ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
-        ${CMAKE_CURRENT_SOURCE_DIR}/Platform
-        ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+        # Nothing
+)
 
-# Manually set sources for Debugging directory as we don't want to include WheatyExceptionReport in common project
-# It needs to be included both in authserver and worldserver for the static global variable to be properly initialized
-# and to handle crash logs on windows
-list(APPEND PRIVATE_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/Debugging/Errors.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Debugging/Errors.hpp)
-
+# >>> Alle Sources Gruppieren
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_definitions(-DSERENITY_API_EXPORT_COMMON)
 
-add_library(Framework
-        ${PRIVATE_SOURCES}
-        )
+add_library(Database ${PRIVATE_SOURCES})
 
-# Do NOT add any extra include directory here, as we don't want the common
-# library to depend on anything else than TC deps, and itself.
+# Do NOT add any extra include directory unless it does not create unneeded extra dependencies,
+# and specially, not add any dependency to neither of these: shared, game, scripts
 # This way we ensure that if either a PR does that without modifying this file,
 # a compile error will be generated, either this file will be modified so it
 # is detected more easily.
 # While it is OK to include files from other libs as long as they don't require
 # linkage (enums, defines...) it is discouraged to do so unless necessary, as it will pullute
 # include_directories leading to further unnoticed dependency aditions
-# Linker Depencency requirements: none
+# Linker Depencency requirements: common
 CollectIncludeDirectories(
         ${CMAKE_CURRENT_SOURCE_DIR}
         PUBLIC_INCLUDES
         # Exclude
         ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-target_include_directories(Framework
+target_include_directories(Database
         PUBLIC
-        # Provide the binary dir for all child targets
-        ${CMAKE_BINARY_DIR}
         ${PUBLIC_INCLUDES}
         PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(Framework
-        PRIVATE
-        process
-        serenity-core-interface
-        PUBLIC
-        boost
-        fmt)
+add_definitions(-DSERENITY_API_EXPORT_DATABASE)
 
-set_target_properties(Framework
+target_link_libraries(Database
+        PRIVATE
+        serenity-core-interface
+        mysql
+        PUBLIC
+        Framework)
+
+set_target_properties(Database
         PROPERTIES
         FOLDER
         "Server")
-

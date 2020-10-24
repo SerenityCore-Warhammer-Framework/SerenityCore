@@ -51,6 +51,6 @@ find_package(Boost)
 include(GroupSources)
 include(AutoCollect)
 
-
+add_subdirectory(Dependencies)
 
 add_subdirectory(Source)
