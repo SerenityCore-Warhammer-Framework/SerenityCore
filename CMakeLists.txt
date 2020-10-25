@@ -37,6 +37,14 @@ endif()
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
+
+# Set Default Build Options
+include(CMake/Options.cmake)
+
+if (NOPCH)
+    set(USE_COREPCH 0)
+endif ()
+
 include(ConfigureBaseTarget)
 include(CheckPlatform)
 
@@ -44,12 +52,18 @@ include(CheckPlatform)
 find_package(MySQL)
 find_package(Git)
 find_package(PCHSupport)
-find_package(OpenSSL)
-find_package(Boost)
 
 # >>> Include CMake Scripts
 include(GroupSources)
 include(AutoCollect)
+
+
+# >>> Find Revision ID and HASH of the sourceTree
+include(CMake/GenRevision.cmake)
+
+# >>> Show Options
+include(CMake/ShowOptions.cmake)
+
 
 add_subdirectory(Dependencies)
 

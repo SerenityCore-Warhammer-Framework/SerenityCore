@@ -18,38 +18,42 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-CollectSourceFiles(
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        PRIVATE_SOURCES
-        # Exclude
+
+# >>> First Collect all Source Files
+CollectIncludeDirectories(
+        ${CMAKE_CURRENT_SOURCE_DIR}                     # The Directory where located the sources
+        PRIVATE_SOURCES                                 # The Variable Name of the Private Sources
+                                                        # Excludes
         ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
         ${CMAKE_CURRENT_SOURCE_DIR}/Platform
         ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-# Manually set sources for Debugging directory as we don't want to include WheatyExceptionReport in common project
-# It needs to be included both in authserver and worldserver for the static global variable to be properly initialized
-# and to handle crash logs on windows
+# >>> Manually set sources for Debugging directory
 list(APPEND PRIVATE_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Debugging/Errors.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Debugging/Errors.hpp)
 
+if(USE_COREPCH)
+    set(PRIVATE_PCH_HEADER PrecompiledHeaders/FrameworkPCH.hpp)
+endif()
+
+
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_definitions(-DSERENITY_API_EXPORT_COMMON)
+add_definitions(-DSERENITY_API_EXPORT_FRAMEWORK)
 
 add_library(Framework
-        ${PRIVATE_SOURCES}
-        )
+        ${PRIVATE_SOURCES})
 
-# Do NOT add any extra include directory here, as we don't want the common
-# library to depend on anything else than TC deps, and itself.
-# This way we ensure that if either a PR does that without modifying this file,
-# a compile error will be generated, either this file will be modified so it
-# is detected more easily.
-# While it is OK to include files from other libs as long as they don't require
-# linkage (enums, defines...) it is discouraged to do so unless necessary, as it will pullute
-# include_directories leading to further unnoticed dependency aditions
-# Linker Depencency requirements: none
+
+# >>> DO NOT ADD ANY EXTRA INCLUDE DIRECTORIES HERE!!! <<<
+# As we don`t want the Framework Library to depend on anything else than SerenityCore(SC) dependencies, and itself.
+# This way we ensure that if either a pr dies that without modifying this file, a compile error will be generated,
+# either this file will be modified so it is detected more easily.
+# While it is OK to include files from other libs as long as they don`t require linkage (enums, defines ...)
+# it is discouraged to do so unless necessary, as it will pullout include_directories leading to further
+# unnoticed dependency
+# Linker Dependency requirements: none
 CollectIncludeDirectories(
         ${CMAKE_CURRENT_SOURCE_DIR}
         PUBLIC_INCLUDES
@@ -58,22 +62,35 @@ CollectIncludeDirectories(
 
 target_include_directories(Framework
         PUBLIC
-        # Provide the binary dir for all child targets
-        ${CMAKE_BINARY_DIR}
-        ${PUBLIC_INCLUDES}
+            # Provide the binary dir for all child targets
+            ${CMAKE_BINARY_DIR}
+            ${PUBLIC_INCLUDES}
         PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR})
+            ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(Framework
         PRIVATE
-        process
-        serenity-core-interface
+            process
+            serenity-core-interface
         PUBLIC
-        boost
-        fmt)
+            boost
+            fmt
+            g3dlib
+            Detour
+            sfmt
+            utf8cpp
+            openssl
+            valgrind
+            threads
+            jemalloc)
+
+add_dependencies(Framework RevisionData.hpp)
 
 set_target_properties(Framework
         PROPERTIES
-        FOLDER
-        "Server")
+            FOLDER
+                "Server")
 
+if (USE_COREPCH)
+    add_cxx_pch(Framework ${PRIVATE_PCH_HEADER})
+endif ()

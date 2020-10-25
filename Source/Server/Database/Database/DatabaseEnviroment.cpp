@@ -1,9 +1,11 @@
 /*
  * This file is part of the Serenity Warhammer Online Framework
- * 
- * Copyright (c)    : SerenityCore Project All rights reserved.
- * Webiste          : serenitycore.org
- * Wiki             : wiki.serenitycore.org
+ *
+ * See LICENSE file for more information
+ *
+ * Website: serenitycore.org
+ * Wiki: wiki.serenitycore.org
+ * Git: github.com/SerenityCore-Warhammer-Framework
  *
  * License:
  * This program is free software; you can redistribute it and/or modify it
@@ -19,6 +21,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "DatabaseEnviroment.hpp"
 
 DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;

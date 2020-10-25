@@ -19,4 +19,23 @@
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+add_subdirectory(threads)
+add_subdirectory(boost)
+add_subdirectory(process)
+add_subdirectory(zlib)
+add_subdirectory(g3dlite)
+add_subdirectory(recastnavigation)
 add_subdirectory(fmt)
+add_subdirectory(SFMT)
+add_subdirectory(utf8cpp)
+add_subdirectory(valgrind)
+add_subdirectory(openssl)
+add_subdirectory(jemalloc)
+add_subdirectory(mysql)
+add_subdirectory(readline)
+add_subdirectory(gsoap)
+add_subdirectory(rapidjson)
+add_subdirectory(efsw)
+add_subdirectory(protobuf)
+add_subdirectory(bzip2)
+add_subdirectory(CascLib)

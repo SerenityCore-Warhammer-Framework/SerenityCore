@@ -22,9 +22,40 @@
 #ifndef SERENITY_UTILS_HPP
 #define SERENITY_UTILS_HPP
 
+// >>> SerenityCore Framework Includes
+#include "Defines.hpp"
+#include "Errors.hpp"
 
-class Utils {
+// >>> C/CXX Standard Includes
+#include <array>
+#include <string>
+#include <vector>
 
+class SC_FRAMEWORK_API Tokenizer {
+public:
+    typedef std::vector<char const*> StorageType;
+
+    typedef StorageType::size_type sizeType;
+    typedef StorageType::const_iterator const_iterator;
+    typedef StorageType::reference reference;
+    typedef StorageType::const_reference const_reference;
+
+public:
+    Tokenizer(const std::string &src, char const seperator, uint32 vectorReserve = 0,
+              bool KeepEmptyStrings = true);
+    ~Tokenizer() { delete[] m_str; }
+
+    const_iterator begin() const { return m_Storage.begin(); }
+    const_iterator end() const { return m_Storage.end(); }
+
+    sizeType size() const { return m_Storage.size(); }
+
+    reference operator[] (sizeType i) { return m_Storage[i]; }
+    const_reference  operator[] (sizeType i) const { return m_Storage[i]; }
+
+private:
+    char* m_str;
+    StorageType m_Storage;
 };
 
 

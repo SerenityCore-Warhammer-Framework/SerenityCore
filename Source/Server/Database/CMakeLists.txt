@@ -19,22 +19,21 @@
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-include_directories(${MYSQL_INCLUDE_DIR})
-include_directories(${Boost_INCLUDE_DIR})
-
-# >>> Alle Source Files zusammen suchen...
 CollectSourceFiles(
         ${CMAKE_CURRENT_SOURCE_DIR}
         PRIVATE_SOURCES
         # Exclude
-        # Nothing
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-# >>> Alle Sources Gruppieren
+if (USE_COREPCH)
+    set(PRIVATE_PCH_HEADER PrecompiledHeaders/DatabasePCH.hpp)
+endif ()
+
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
+add_library(Database
+        ${PRIVATE_SOURCES})
 
-add_library(Database ${PRIVATE_SOURCES})
 
 # Do NOT add any extra include directory unless it does not create unneeded extra dependencies,
 # and specially, not add any dependency to neither of these: shared, game, scripts
@@ -44,7 +43,8 @@ add_library(Database ${PRIVATE_SOURCES})
 # While it is OK to include files from other libs as long as they don't require
 # linkage (enums, defines...) it is discouraged to do so unless necessary, as it will pullute
 # include_directories leading to further unnoticed dependency aditions
-# Linker Depencency requirements: common
+# Linker Depencency requirements: Framework
+
 CollectIncludeDirectories(
         ${CMAKE_CURRENT_SOURCE_DIR}
         PUBLIC_INCLUDES
@@ -53,20 +53,25 @@ CollectIncludeDirectories(
 
 target_include_directories(Database
         PUBLIC
-        ${PUBLIC_INCLUDES}
+            ${PUBLIC_INCLUDES}
         PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR})
+            ${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions(-DSERENITY_API_EXPORT_DATABASE)
 
 target_link_libraries(Database
         PRIVATE
-        serenity-core-interface
-        mysql
+            serenity-core-interface
+            mysql
+            Framework
         PUBLIC
-        Framework)
+            Framework)
 
 set_target_properties(Database
         PROPERTIES
-        FOLDER
-        "Server")
+            FOLDER
+                "Server")
+
+if (USE_COREPCH)
+    add_cxx_pch(Database ${PRIVATE_PCH_HEADER})
+endif ()

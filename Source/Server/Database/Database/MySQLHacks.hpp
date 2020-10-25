@@ -1,9 +1,11 @@
 /*
  * This file is part of the Serenity Warhammer Online Framework
- * 
- * Copyright (c)    : SerenityCore Project All rights reserved.
- * Webiste          : serenitycore.org
- * Wiki             : wiki.serenitycore.org
+ *
+ * See LICENSE file for more information
+ *
+ * Website: serenitycore.org
+ * Wiki: wiki.serenitycore.org
+ * Git: github.com/SerenityCore-Warhammer-Framework
  *
  * License:
  * This program is free software; you can redistribute it and/or modify it
@@ -19,13 +21,21 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef SERENITY_MYSQLHACKS_HPP
 #define SERENITY_MYSQLHACKS_HPP
 
+#include "MySQLWorkaround.hpp"
 
-class MySQLHacks {
+#include <type_traits>
 
-};
+struct MySQLHandle : MYSQL { };
+struct MySQLResult : MYSQL_RES { };
+struct MySQLField : MYSQL_FIELD { };
+struct MySQLBind : MYSQL_BIND { };
+struct MySQLStmt : MYSQL_STMT { };
+
+using MySQLBool = std::remove_pointer_t<decltype(std::declval<MYSQL_BIND>().is_null)>;
 
 
 #endif //SERENITY_MYSQLHACKS_HPP

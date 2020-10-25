@@ -19,16 +19,16 @@
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# >>> Eine INTERFACE Library, um das Ziel-COM für andere Ziele zur verfügung zu stellen.
-add_library(serenity-compile-option-interface INTERFACE)
+# >>> An INTERFACE Library to make the compiling targets available to other targets
+add_library(serenity-compiling-options-interface INTERFACE)
 
-# Use -std=c++11 instead of -std=gnu++11
+# >>> Use -std=c++11 instead of -std=gnu++11
 set(CXX_EXTENSIONS OFF)
 
-# >>> Eine INTERFACE Library, um das target FEATURE für andere Ziele zu verfügung zu stellen.
+# >>> An INTERFACE Library to make the serenity-features INTERFACE available to other targets
 add_library(serenity-feature-interface INTERFACE)
 target_compile_features(serenity-feature-interface
-        INTERFACE
+        INTERFACE # A list of Compiling features that we will use.
         cxx_alias_templates
         cxx_auto_type
         cxx_constexpr
@@ -43,36 +43,40 @@ target_compile_features(serenity-feature-interface
         cxx_trailing_return_types
         cxx_return_type_deduction)
 
-# >>> Eine INTERFACE Library, um die Warning-Levels auf anderen Zielen zur verfügung zu stellen.
+# An INTERFACE Library to make warning levels available to other targets
 add_library(serenity-warning-interface INTERFACE)
 
-# >>> Eine INTERFACE Library. für alle anderen INTERFACES
+
+# An INTERFACE Library used for all other INTERFACES
 add_library(serenity-default-interface INTERFACE)
 target_link_libraries(serenity-default-interface
-        INTERFACE
-        serenity-compile-option-interface
+        INTERFACE # A list of INTERFACES that we will link into
+        serenity-compiling-options-interface
         serenity-feature-interface)
 
-# >>> Eine INTERFACE Library, genutzt für alle silence warnungen
+# An INTERFACE Library for silencing all warnings
 add_library(serenity-no-warning-interface INTERFACE)
+target_compile_options(serenity-no-warning-interface
+        INTERFACE
+            -w)
 
-# An interface library to change the default behaviour
-# to hide symbols automatically.
+# An INTERFACE Library to change the behaviour to hide symbols automatically
 add_library(serenity-hidden-symbols-interface INTERFACE)
 
 
-# >>> Eine INTERFACE Verschmelzung
+# An INTERFACE Library which provides the flags and definitions used by the dependencies targets
 add_library(serenity-dependencies-interface INTERFACE)
 target_link_libraries(serenity-dependencies-interface
         INTERFACE
-        serenity-default-interface
-        serenity-no-warning-interface
-        serenity-hidden-symbols-interface)
+        serenity-default-interface          # Provides "Compiling" and "Feature" Interface Libraries
+        serenity-no-warning-interface       # Silencing all warnings
+        serenity-hidden-symbols-interface   # Default behaviour (hide symbols)
+        )
 
-# >>> Eine INTERFACE Library verschmelzung was sicherstellt,
-# >>> das alle flags und definitionen in allen projekten vorhanden ist
+# An INTERFACE Library which provides the flags and definitions are used by the core
 add_library(serenity-core-interface INTERFACE)
 target_link_libraries(serenity-core-interface
         INTERFACE
         serenity-default-interface
-        serenity-warning-interface)
+        serenity-warning-interface
+        )
